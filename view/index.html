@@ -55,14 +55,43 @@
   <div class="container">
     <label>Theme Font Style:</label>
     <select id="fontSelect">
-      <option value="system-ui, -apple-system">Default System Font</option>
-      <option value="'JetBrains Mono', monospace">JetBrains Mono (Geek Code)</option>
-      <option value="'Inter', sans-serif">Inter (Modern Minimalist)</option>
+      <option value="system">默认系统</option>
 
-      <option value="'Press Start 2P', cursive">Press Start 2P (Retro 8-Bit)</option>
-      <option value="'Orbitron', sans-serif">Orbitron (Cyberpunk Sci-Fi)</option>
-      <option value="'Cinzel', serif">Cinzel (Imperial Roman Elegance)</option>
-      <option value="'Sacramento', cursive">Sacramento (Fluid Handwriting)</option>
+      <option value="pingfang">
+        苹果苹方
+      </option>
+
+      <option value="yahei">
+        微软雅黑
+      </option>
+
+      <option value="dengxian">
+        等线
+      </option>
+
+      <option value="kaiti">
+        楷体
+      </option>
+
+      <option value="songti">
+        宋体
+      </option>
+
+      <option value="mono">
+        极客代码风
+      </option>
+
+      <option value="notebook">
+        手账风
+      </option>
+
+      <option value="minimal">
+        极简风
+      </option>
+
+      <option value="cyber">
+        赛博朋克
+      </option>
     </select>
     <button onclick="applyFont()">Apply Font</button>
   </div>
@@ -90,7 +119,7 @@
         currentFilePath = msg.filePath || '';
         if (msg.theme?.color) document.body.style.color = msg.theme.color;
 
-        const savedFont = localStorage.getItem('active_system_font');
+        const savedFont = localStorage.getItem('active_font_preset');
         if (savedFont) {
           document.getElementById('fontSelect').value = savedFont;
         }
@@ -103,15 +132,17 @@
     });
 
     function applyFont() {
-      const font = document.getElementById('fontSelect').value;
-      localStorage.setItem('active_system_font', font);
+      const preset =
+        document.getElementById(
+          "fontSelect"
+        ).value;
 
-      callPlugin('updateSystemFont', {
-        fontFamily: font,
-        filePath: currentFilePath
-      }).catch((err) => {
-        console.error("Font alteration failed:", err);
-      });
+      localStorage.setItem(
+        "active_font_preset",
+        preset
+      );
+
+      callPlugin('relaunchToUpdate')
     }
   </script>
 </body>
