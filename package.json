@@ -6,6 +6,10 @@
   "view": "./view",
   "viewjs": "./inject.js",
   "license": "MIT",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
   "devDependencies": {
     "@aicupa/api": "^1.0.4"
   }
