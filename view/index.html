@@ -4,11 +4,116 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Art Font Switcher</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding: 10px;
+      margin: 0;
+      background: transparent;
+      color: #ccc;
+      height: auto;
+      overflow: hidden;
+    }
+
+    .container {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    select,
+    button {
+      background: #1e1e1e;
+      border: 1px solid #383838;
+      color: #fff;
+      padding: 5px 10px;
+      border-radius: 4px;
+      outline: none;
+    }
+
+    button {
+      background: #007acc;
+      cursor: pointer;
+      border: none;
+    }
+
+    button:hover {
+      background: #0062a3;
+    }
+
+    label {
+      font-size: 12px;
+      font-weight: 500;
+      color: #888;
+    }
+  </style>
 </head>
 
 <body>
 
+  <div class="container">
+    <label>Theme Font Style:</label>
+    <select id="fontSelect">
+      <option value="system-ui, -apple-system">Default System Font</option>
+      <option value="'JetBrains Mono', monospace">JetBrains Mono (Geek Code)</option>
+      <option value="'Inter', sans-serif">Inter (Modern Minimalist)</option>
+
+      <option value="'Press Start 2P', cursive">Press Start 2P (Retro 8-Bit)</option>
+      <option value="'Orbitron', sans-serif">Orbitron (Cyberpunk Sci-Fi)</option>
+      <option value="'Cinzel', serif">Cinzel (Imperial Roman Elegance)</option>
+      <option value="'Sacramento', cursive">Sacramento (Fluid Handwriting)</option>
+    </select>
+    <button onclick="applyFont()">Apply Font</button>
+  </div>
+
+  <script>
+    let callId = 0;
+    const pending = {};
+    let currentFilePath = '';
+
+    function callPlugin(method, params) {
+      return new Promise((resolve, reject) => {
+        const id = ++callId;
+        const timer = setTimeout(() => { delete pending[id]; reject(new Error('timeout')); }, 2000);
+        pending[id] = {
+          resolve: (v) => { clearTimeout(timer); resolve(v); },
+          reject: (e) => { clearTimeout(timer); reject(e); }
+        };
+        window.parent.postMessage({ type: 'plugin-call', id, method, params }, '*');
+      });
+    }
+
+    window.addEventListener('message', (event) => {
+      const msg = event.data;
+      if (msg?.type === 'plugin-init') {
+        currentFilePath = msg.filePath || '';
+        if (msg.theme?.color) document.body.style.color = msg.theme.color;
+
+        const savedFont = localStorage.getItem('active_system_font');
+        if (savedFont) {
+          document.getElementById('fontSelect').value = savedFont;
+        }
+      }
+      if (msg?.type === 'plugin-result' && pending[msg.id]) {
+        const { resolve, reject } = pending[msg.id];
+        delete pending[msg.id];
+        msg.error ? reject(new Error(msg.error)) : resolve(msg.result);
+      }
+    });
+
+    function applyFont() {
+      const font = document.getElementById('fontSelect').value;
+      localStorage.setItem('active_system_font', font);
+
+      callPlugin('updateSystemFont', {
+        fontFamily: font,
+        filePath: currentFilePath
+      }).catch((err) => {
+        console.error("Font alteration failed:", err);
+      });
+    }
+  </script>
 </body>
 
 </html>
