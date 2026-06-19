@@ -2,7 +2,6 @@
   "name": "@aicupa/plugin-font-switcher",
   "version": "1.0.3",
   "description": "Custom Font Switcher for Aicupa Theme Customization",
-  "main": "./service",
   "view": "./view",
   "viewjs": "./inject.js",
   "license": "MIT",
